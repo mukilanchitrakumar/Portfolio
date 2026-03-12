@@ -41,29 +41,96 @@
       font-family: var(--font-mono);
       line-height: 1.7;
       overflow-x: hidden;
-      cursor: none;
     }
     a { color: inherit; text-decoration: none; }
 
     /* ---- CUSTOM CURSOR ---- */
+    * { cursor: none !important; }
+
     .cursor {
       width: 10px; height: 10px;
       background: var(--amber);
       border-radius: 50%;
-      position: fixed; top: 0; left: 0;
-      pointer-events: none; z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: transform 0.1s ease;
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 99999;
+      margin: -5px 0 0 -5px;
+      mix-blend-mode: difference;
+      box-shadow: 0 0 8px 2px rgba(245,166,35,0.7), 0 0 20px 4px rgba(245,166,35,0.3);
+      transition: width 0.15s ease, height 0.15s ease, margin 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
     }
     .cursor-follower {
-      width: 36px; height: 36px;
+      width: 40px; height: 40px;
       border: 1.5px solid var(--amber);
       border-radius: 50%;
-      position: fixed; top: 0; left: 0;
-      pointer-events: none; z-index: 9998;
-      transform: translate(-50%, -50%);
-      transition: transform 0.18s ease, opacity 0.3s;
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 99998;
+      margin: -20px 0 0 -20px;
       opacity: 0.5;
+      transition: width 0.25s ease, height 0.25s ease, margin 0.25s ease, opacity 0.25s ease, border-color 0.25s ease;
+    }
+    /* Spinning dashed outer ring */
+    .cursor-follower::before {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 1px dashed rgba(245,166,35,0.35);
+      animation: spinRing 4s linear infinite;
+    }
+    /* Pulse ping animation */
+    .cursor-follower::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 50%;
+      border: 1px solid rgba(245,166,35,0.5);
+      animation: pingPulse 2s ease-out infinite;
+      opacity: 0;
+    }
+    @keyframes spinRing { to { transform: rotate(360deg); } }
+    @keyframes pingPulse {
+      0%   { transform: scale(1);   opacity: 0.6; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    /* Hover state — cursor morphs into a ring */
+    .cursor.hovered {
+      width: 6px; height: 6px;
+      background: var(--amber);
+      margin: -3px 0 0 -3px;
+      box-shadow: 0 0 14px 4px rgba(245,166,35,0.9), 0 0 40px 10px rgba(245,166,35,0.4);
+    }
+    .cursor-follower.hovered {
+      width: 56px; height: 56px;
+      margin: -28px 0 0 -28px;
+      opacity: 0.7;
+      border-color: var(--white);
+      border-width: 2px;
+    }
+
+    /* Click burst */
+    .cursor.clicking {
+      width: 16px; height: 16px;
+      margin: -8px 0 0 -8px;
+      background: var(--white);
+      box-shadow: 0 0 20px 6px rgba(255,255,255,0.6);
+    }
+
+    /* Trail dots */
+    .cursor-trail {
+      width: 5px; height: 5px;
+      background: var(--amber);
+      border-radius: 50%;
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      z-index: 99990;
+      opacity: 0;
+      transition: opacity 0.1s;
     }
 
     /* ---- NAV ---- */
@@ -131,8 +198,11 @@
     .hero-eyebrow { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.08em; color: var(--amber); text-transform: uppercase; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.6rem; }
     .blink { animation: blink 1.2s step-end infinite; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-    .hero-name { font-family: var(--font-display); font-size: clamp(3.5rem, 10vw, 8rem); font-weight: 800; color: var(--white); line-height: 0.95; letter-spacing: -3px; margin-bottom: 1.5rem; display: flex; flex-direction: column; }
-    .name-line { display: block; overflow: hidden; opacity: 0; transform: translateY(60px); animation: revealUp 0.8s ease forwards; }
+    .hero-name { font-family: var(--font-display); font-size: clamp(3rem, 9vw, 7.5rem); font-weight: 800; color: var(--white); line-height: 1; letter-spacing: -2px; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.05em; }
+    .name-line { display: block; opacity: 0; transform: translateY(40px); animation: revealUp 0.9s cubic-bezier(0.22,1,0.36,1) forwards; }
+    .name-line:nth-child(1) { animation-delay: 0.1s; }
+    .name-line:nth-child(2) { animation-delay: 0.25s; }
+    @keyframes revealUp { 0% { opacity: 0; transform: translateY(40px); } 100% { opacity: 1; transform: translateY(0); } }
     .hero-title { font-family: var(--font-mono); font-size: clamp(0.85rem, 2vw, 1rem); color: var(--amber); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1.5rem; }
     .hero-tagline { font-size: clamp(1rem, 2vw, 1.15rem); color: var(--muted); max-width: 580px; margin-bottom: 2.5rem; line-height: 1.8; }
     .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 4rem; }
@@ -281,7 +351,6 @@
 
     /* ---- ANIMATIONS ---- */
     .reveal-up { opacity: 0; transform: translateY(28px); animation: revealUp 0.7s ease forwards; }
-    @keyframes revealUp { to { opacity: 1; transform: translateY(0); } }
     .delay-1 { animation-delay: 0.15s; }
     .delay-2 { animation-delay: 0.3s; }
     .delay-3 { animation-delay: 0.45s; }
@@ -621,33 +690,85 @@
     // ---- CUSTOM CURSOR ----
     const cursor = document.getElementById('cursor');
     const follower = document.getElementById('cursorFollower');
-    let mouseX = 0, mouseY = 0, followerX = 0, followerY = 0;
+    let mouseX = 0, mouseY = 0;
+    let followerX = 0, followerY = 0;
 
+    // Track mouse
     document.addEventListener('mousemove', (e) => {
-      mouseX = e.clientX; mouseY = e.clientY;
+      mouseX = e.clientX;
+      mouseY = e.clientY;
       cursor.style.left = mouseX + 'px';
       cursor.style.top  = mouseY + 'px';
+      spawnTrail(mouseX, mouseY);
     });
 
+    // Smooth follower
     (function animateFollower() {
-      followerX += (mouseX - followerX) * 0.12;
-      followerY += (mouseY - followerY) * 0.12;
+      followerX += (mouseX - followerX) * 0.1;
+      followerY += (mouseY - followerY) * 0.1;
       follower.style.left = followerX + 'px';
       follower.style.top  = followerY + 'px';
       requestAnimationFrame(animateFollower);
     })();
 
-    document.querySelectorAll('a, button, .project-card, .cert-card, .skill-category').forEach(el => {
+    // Hover effects with magnetic snap on cards
+    document.querySelectorAll('a, button').forEach(el => {
       el.addEventListener('mouseenter', () => {
-        cursor.style.transform = 'translate(-50%,-50%) scale(2)';
-        follower.style.transform = 'translate(-50%,-50%) scale(1.5)';
-        follower.style.opacity = '0.8';
+        cursor.classList.add('hovered');
+        follower.classList.add('hovered');
       });
       el.addEventListener('mouseleave', () => {
-        cursor.style.transform = 'translate(-50%,-50%) scale(1)';
-        follower.style.transform = 'translate(-50%,-50%) scale(1)';
-        follower.style.opacity = '0.5';
+        cursor.classList.remove('hovered');
+        follower.classList.remove('hovered');
       });
+    });
+
+    document.querySelectorAll('.project-card, .cert-card, .skill-category, .edu-card').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.classList.add('hovered');
+        follower.classList.add('hovered');
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.classList.remove('hovered');
+        follower.classList.remove('hovered');
+      });
+    });
+
+    // Click burst effect
+    document.addEventListener('mousedown', () => cursor.classList.add('clicking'));
+    document.addEventListener('mouseup',   () => cursor.classList.remove('clicking'));
+
+    // Trail dots
+    const TRAIL_COUNT = 8;
+    const trails = [];
+    for (let i = 0; i < TRAIL_COUNT; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'cursor-trail';
+      document.body.appendChild(dot);
+      trails.push({ el: dot, x: 0, y: 0, age: 0 });
+    }
+
+    let trailIndex = 0;
+    function spawnTrail(x, y) {
+      const t = trails[trailIndex % TRAIL_COUNT];
+      t.x = x; t.y = y; t.age = 1;
+      t.el.style.left    = x + 'px';
+      t.el.style.top     = y + 'px';
+      t.el.style.opacity = '0.55';
+      const scale = 1 - (trailIndex % TRAIL_COUNT) / TRAIL_COUNT * 0.6;
+      t.el.style.transform = `translate(-50%,-50%) scale(${scale})`;
+      setTimeout(() => { t.el.style.opacity = '0'; }, 60 + trailIndex % TRAIL_COUNT * 20);
+      trailIndex++;
+    }
+
+    // Hide cursor when leaving window
+    document.addEventListener('mouseleave', () => {
+      cursor.style.opacity = '0';
+      follower.style.opacity = '0';
+    });
+    document.addEventListener('mouseenter', () => {
+      cursor.style.opacity = '1';
+      follower.style.opacity = '0.5';
     });
 
     // ---- NAVBAR SCROLL EFFECT ----
